@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
-const baseUrl = 'http://localhost:5005/api';
+const baseUrl = 'https://atomquest-backend-7u7u.onrender.com/api';
 
 async function testApi() {
   console.log('Testing Goal Controller Constraints...');

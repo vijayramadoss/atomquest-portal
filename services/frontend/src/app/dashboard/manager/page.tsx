@@ -40,7 +40,7 @@ export default function ManagerDashboard() {
     try {
       const token = getToken();
 
-      const res = await fetch("http://localhost:5005/api/goals/manager/team", {
+      const res = await fetch("https://atomquest-backend-7u7u.onrender.com/api/goals/manager/team", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -149,7 +149,7 @@ export default function ManagerDashboard() {
       };
 
       const res = await fetch(
-        `http://localhost:5005/api/goals/${goalId}/manager-edit`,
+        `https://atomquest-backend-7u7u.onrender.com/api/goals/${goalId}/manager-edit`,
         {
           method: "PUT",
           headers: {
@@ -185,7 +185,7 @@ export default function ManagerDashboard() {
       setActionLoading(true);
       const token = getToken();
 
-      const res = await fetch(`http://localhost:5005/api/goals/${sheetId}/approve`, {
+      const res = await fetch(`https://atomquest-backend-7u7u.onrender.com/api/goals/${sheetId}/approve`, {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -219,7 +219,7 @@ export default function ManagerDashboard() {
       setActionLoading(true);
       const token = getToken();
 
-      const res = await fetch(`http://localhost:5005/api/goals/${sheetId}/reject`, {
+      const res = await fetch(`https://atomquest-backend-7u7u.onrender.com/api/goals/${sheetId}/reject`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -258,7 +258,7 @@ export default function ManagerDashboard() {
       const token = getToken();
 
       const res = await fetch(
-        `http://localhost:5005/api/goals/${goalId}/review/${selectedQuarter}`,
+        `https://atomquest-backend-7u7u.onrender.com/api/goals/${goalId}/review/${selectedQuarter}`,
         {
           method: "PUT",
           headers: {

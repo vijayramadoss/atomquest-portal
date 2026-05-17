@@ -57,7 +57,7 @@ export const useGoalStore = create<GoalStore>((set, get) => ({
     if (!token) return;
 
     try {
-      const res = await fetch("http://localhost:5005/api/goals", {
+      const res = await fetch("https://atomquest-backend-7u7u.onrender.com/api/goals", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -80,7 +80,7 @@ export const useGoalStore = create<GoalStore>((set, get) => ({
 
     const normalizedGoals = normalizeGoals(goals);
 
-    const res = await fetch("http://localhost:5005/api/goals", {
+    const res = await fetch("https://atomquest-backend-7u7u.onrender.com/api/goals", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -110,7 +110,7 @@ export const useGoalStore = create<GoalStore>((set, get) => ({
 
     const normalizedGoals = normalizeGoals(goals);
 
-    const saveRes = await fetch("http://localhost:5005/api/goals", {
+    const saveRes = await fetch("https://atomquest-backend-7u7u.onrender.com/api/goals", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -135,7 +135,7 @@ export const useGoalStore = create<GoalStore>((set, get) => ({
     }
 
     const submitRes = await fetch(
-      `http://localhost:5005/api/goals/${sheetId}/submit`,
+      `https://atomquest-backend-7u7u.onrender.com/api/goals/${sheetId}/submit`,
       {
         method: "POST",
         headers: {

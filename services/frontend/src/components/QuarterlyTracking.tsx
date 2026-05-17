@@ -150,7 +150,7 @@ export default function QuarterlyTracking() {
             : Number(goal.achievement || 0);
 
         const res = await fetch(
-          `http://localhost:5005/api/goals/${goal._id}/tracking/${quarter}`,
+          `https://atomquest-backend-7u7u.onrender.com/api/goals/${goal._id}/tracking/${quarter}`,
           {
             method: "PUT",
             headers: {
