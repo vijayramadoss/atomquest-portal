@@ -1,284 +1,303 @@
-\# AtomQuest Portal
+# 🚀 AtomQuest — Enterprise KPI & Goal Governance Portal
 
+## 🏆 AtomQuest Hackathon 1.0 Submission
 
+A modern enterprise-grade KPI governance and employee performance tracking platform designed to streamline organizational goal setting, approvals, quarterly reviews, and analytics.
 
-\## Overview
+---
 
-AtomQuest Portal is a full-stack enterprise goal management and performance tracking platform designed for Employees, Managers, and Admin/HR teams.
+# 🌐 Live Demo
 
+Frontend URL:  
+https://atomquest-portal-zeta-liard.vercel.app
 
+GitHub Repository:  
+https://github.com/vijayramadoss/atomquest-portal
 
-The system enables:
+---
 
-\- Goal creation and tracking
+# 📌 Project Overview
 
-\- Quarterly performance check-ins
+Organizations often struggle with fragmented goal management systems involving spreadsheets, emails, and disconnected review cycles.
 
-\- Manager review and approvals
+AtomQuest solves this by providing a centralized web-based portal for:
 
-\- Rework and rejection workflows
+- Goal creation & tracking
+- Role-based workflows
+- Quarterly achievement check-ins
+- Approval governance
+- KPI visibility
+- Real-time analytics dashboards
 
-\- Admin governance analytics
+The platform supports complete workflows for:
 
+- Employee
+- Manager
+- Admin / HR Teams
 
+---
 
-\---
+# ✨ Core Features
 
+## 🔐 Authentication & Role Management
 
+- Secure JWT-based authentication
+- Role-based access control
+- Separate dashboards for:
+  - Employee
+  - Manager
+  - Admin
 
-\# Features
+---
 
+## 👨‍💼 Employee Workspace
 
+Employees can:
 
-\## Employee Features
+- Create KPI goal sheets
+- Define:
+  - Goal title
+  - Description
+  - Thrust area
+  - Weightage
+  - Targets
+  - Measurement types
+- Submit goals for approval
+- Track quarterly achievements
+- Update progress status:
+  - Not Started
+  - On Track
+  - Completed
 
-\- Employee Login
+### Validation Rules Implemented
 
-\- Create Goals
+- Total goal weightage must equal 100%
+- Minimum goal weightage: 10%
+- Maximum goals allowed: 8
 
-\- Save Draft
+---
 
-\- Submit Goal Sheet
+## 🧑‍💼 Manager Approval Center
 
-\- Quarterly Tracking (Q1–Q4)
+Managers can:
 
-\- Goal Progress Updates
+- Review employee submissions
+- Approve or reject goals
+- Request rework
+- Monitor review queues
+- Track team review performance
+- Add quarterly review feedback
+- Monitor KPI completion progress
 
-\- Timeline / Numeric / Percentage goals
+---
 
+## 🛡️ Admin Governance Console
 
+Admins can:
 
-\## Manager Features
+- Monitor organization-wide KPIs
+- Track quarterly completion trends
+- View governance analytics
+- Push shared organizational goals
+- Manage approval workflows
+- View escalation modules
+- Access reporting dashboards
 
-\- Dynamic Employee Team Dashboard
+---
 
-\- Review Employee Goals
+# 📊 Analytics & Insights
 
-\- Edit Goals
+The platform includes:
 
-\- Weightage Validation
+- Quarterly completion tracking
+- Goal performance analytics
+- Approval metrics
+- Governance dashboards
+- Team KPI monitoring
+- Review activity tracking
 
-\- Approve Goal Sheets
+---
 
-\- Reject \& Request Rework
+# 🏗️ Tech Stack
 
-\- Quarterly Review Comments
+## Frontend
+- Next.js 15
+- React 19
+- TypeScript
+- Tailwind CSS
+- Lucide Icons
+- Zustand State Management
+- shadcn/ui
 
+## Backend
+- Node.js
+- Express.js
+- TypeScript
 
+## Database
+- MongoDB Atlas
 
-\## Admin Features
+## Authentication
+- JWT Authentication
 
-\- Governance Dashboard
+## Deployment
+- Vercel (Frontend)
+- Render (Backend)
 
-\- System-wide Analytics
+---
 
-\- KPI Monitoring
+# 🧠 System Architecture
 
-\- UOM Distribution Analytics
-
-
-
-\---
-
-
-
-\# Tech Stack
-
-
-
-\## Frontend
-
-\- Next.js
-
-\- TypeScript
-
-\- Tailwind CSS
-
-\- Zustand
-
-
-
-\## Backend
-
-\- Express.js
-
-\- Node.js
-
-\- TypeScript
-
-\- JWT Authentication
-
-
-
-\## Database
-
-\- MongoDB Atlas
-
-
-
-\---
-
-
-
-\# Architecture
-
-
-
-Browser (Frontend - Next.js)
-
-↓
-
-Express Backend API
-
-↓
-
+```text
+Frontend (Next.js + React)
+            ↓
+Backend API (Node.js + Express)
+            ↓
 MongoDB Atlas Database
-
-
-
-\---
-
-
-
-\# User Roles
-
-
-
-\## Employee
-
-Creates and tracks goals.
-
-
-
-\## Manager
-
-Reviews, edits, approves, and rejects employee goals.
-
-
-
-\## Admin
-
-Monitors analytics and governance dashboards.
-
-
-
-\---
-
-
-
-\# Installation
-
-
-
-\## Backend
-
-
-
-```bash
-
-cd services/backend
-
-npm install
-
-npm run dev
-
 ```
 
+---
 
+# 👥 Demo Credentials
 
-\## Frontend
+## Employee
 
+```text
+Email: realemployee@test.com
+Password: employee123
+```
 
+## Manager
+
+```text
+Email: manager@test.com
+Password: manager123
+```
+
+## Admin
+
+```text
+Email: admin@test.com
+Password: admin123
+```
+
+---
+
+# ⚙️ Local Setup Instructions
+
+## 1. Clone Repository
 
 ```bash
+git clone https://github.com/vijayramadoss/atomquest-portal.git
+```
 
+---
+
+## 2. Install Dependencies
+
+### Frontend
+
+```bash
 cd services/frontend
-
 npm install
-
-npm run dev
-
 ```
 
+### Backend
 
+```bash
+cd services/backend
+npm install
+```
 
-\---
+---
 
+## 3. Configure Environment Variables
 
-
-\# Environment Variables
-
-
-
-Backend `.env`
-
-
+### Frontend `.env.local`
 
 ```env
-
-MONGO\_URI=your\_mongodb\_uri
-
-JWT\_SECRET=your\_secret
-
-PORT=5005
-
+NEXT_PUBLIC_API_URL=YOUR_BACKEND_URL
 ```
 
+### Backend `.env`
 
+```env
+MONGODB_URI=YOUR_MONGODB_URI
+JWT_SECRET=YOUR_SECRET
+PORT=5000
+```
 
-\---
+---
 
+## 4. Run Development Servers
 
+### Frontend
 
-\# Demo Credentials
+```bash
+npm run dev
+```
 
+### Backend
 
+```bash
+npm run dev
+```
 
-\## Employee
+---
 
-Email:
+# 📂 Project Structure
 
-realemployee@test.com
+```text
+atomquest-portal/
+│
+├── services/
+│   ├── frontend/
+│   └── backend/
+│
+└── README.md
+```
 
+---
 
+# 🎯 Hackathon Requirements Covered
 
-Password:
+- Goal Creation & Submission
+- Goal Validation Rules
+- Quarterly Achievement Tracking
+- Role-Based Dashboards
+- Manager Approval Workflow
+- Admin Governance Console
+- Analytics Dashboard
+- KPI Tracking
+- Shared Goal Governance
+- Responsive UI
+- Live Deployment
 
-employee123
+---
 
+# 🚀 Future Enhancements
 
+- Microsoft Entra ID Integration
+- Email Notifications
+- Microsoft Teams Integration
+- Advanced Analytics Engine
+- AI-powered KPI Suggestions
+- Automated Escalation Workflows
+- Department Hierarchy Mapping
+- Exportable Reports (CSV / Excel)
 
-\## Manager
+---
 
-Email:
+# 👨‍💻 Developer
 
-manager@test.com
+## Vijay Ramadoss
 
+Solo Hackathon Project Submission for:
 
+### 🏆 AtomQuest Hackathon 1.0
 
-Password:
+---
 
-manager123
+# 📄 License
 
-
-
-\## Admin
-
-Email:
-
-admin@test.com
-
-
-
-Password:
-
-admin123
-
-
-
-\---
-
-
-
-
-
+This project is developed for educational and hackathon purposes.
