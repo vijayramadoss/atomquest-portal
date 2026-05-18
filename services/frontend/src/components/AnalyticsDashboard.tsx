@@ -13,21 +13,33 @@ import {
   Area,
 } from "recharts";
 
-const qOqData = [
+const fallbackQoqData = [
   { quarter: "Q1", target: 80, achieved: 65 },
   { quarter: "Q2", target: 85, achieved: 78 },
   { quarter: "Q3", target: 90, achieved: 88 },
   { quarter: "Q4", target: 100, achieved: 95 },
 ];
 
-const uomData = [
+const fallbackUomData = [
   { name: "Numeric", frequency: 45 },
-  { name: "Percentage", frequency: 30 },
+  { name: "%", frequency: 30 },
   { name: "Timeline", frequency: 15 },
   { name: "Zero-based", frequency: 10 },
 ];
 
-export default function AnalyticsDashboard() {
+export default function AnalyticsDashboard({ analytics }: { analytics?: any }) {
+  const qOqData =
+    analytics?.qOqData && analytics.qOqData.length > 0
+      ? analytics.qOqData
+      : fallbackQoqData;
+
+  const uomData =
+    analytics?.uomDistribution && analytics.uomDistribution.length > 0
+      ? analytics.uomDistribution
+      : fallbackUomData;
+
+  const summary = analytics?.summary;
+
   return (
     <div className="space-y-8 mt-10 w-full">
       <div>
@@ -35,6 +47,35 @@ export default function AnalyticsDashboard() {
           System-wide Analytics
         </h2>
       </div>
+
+      {summary && (
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+          <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+            <div className="text-xs text-slate-400">Users</div>
+            <div className="text-2xl font-bold">{summary.usersCount}</div>
+          </div>
+
+          <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+            <div className="text-xs text-slate-400">Employees</div>
+            <div className="text-2xl font-bold">{summary.employeesCount}</div>
+          </div>
+
+          <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+            <div className="text-xs text-slate-400">Managers</div>
+            <div className="text-2xl font-bold">{summary.managersCount}</div>
+          </div>
+
+          <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+            <div className="text-xs text-slate-400">GoalSheets</div>
+            <div className="text-2xl font-bold">{summary.sheetsCount}</div>
+          </div>
+
+          <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+            <div className="text-xs text-slate-400">Goals</div>
+            <div className="text-2xl font-bold">{summary.goalsCount}</div>
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 w-full">
         <div className="bg-white/5 border border-white/10 rounded-xl p-6 min-w-0">
