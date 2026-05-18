@@ -1,43 +1,42 @@
 "use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { Shield, Lock, User } from 'lucide-react';
-import { useGoalStore } from '@/store/useGoalStore';
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { ArrowRight, Lock, Mail, User, ShieldCheck } from "lucide-react";
+import { useGoalStore } from "@/store/useGoalStore";
+
+const API_URL =
+  process.env.NEXT_PUBLIC_API_URL ||
+  "https://atomquest-backend-7u7u.onrender.com";
 
 export default function Home() {
   const router = useRouter();
+  const { setAuth } = useGoalStore();
 
   const [isLogin, setIsLogin] = useState(true);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-  const [email, setEmail] = useState("employee@test.com");
-  const [password, setPassword] = useState("employee123");
-
-  const [name, setName] = useState("John Employee");
+  const [name, setName] = useState("");
   const [role, setRole] = useState("Employee");
 
   const [loading, setLoading] = useState(false);
 
-  const { setAuth } = useGoalStore();
-
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
-
     setLoading(true);
 
     try {
-      const endpoint = isLogin
-        ? '/api/auth/login'
-        : '/api/auth/register';
+      const endpoint = isLogin ? "/api/auth/login" : "/api/auth/register";
 
       const bodyPayload = isLogin
         ? { email, password }
         : { name, email, password, role };
 
-      const res = await fetch(`https://atomquest-backend-7u7u.onrender.com${endpoint}`, {
-        method: 'POST',
+      const res = await fetch(`${API_URL}${endpoint}`, {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(bodyPayload),
       });
@@ -45,23 +44,22 @@ export default function Home() {
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.message || 'Authentication failed');
+        throw new Error(data.message || "Authentication failed");
       }
 
       setAuth(data.token, data.user);
 
       const normalizedRole = data.user.role?.toLowerCase();
 
-      if (normalizedRole.includes('employee')) {
-        router.push('/dashboard/employee');
-      } else if (normalizedRole.includes('manager')) {
-        router.push('/dashboard/manager');
-      } else if (normalizedRole.includes('admin')) {
-        router.push('/dashboard/admin');
+      if (normalizedRole.includes("employee")) {
+        router.push("/dashboard/employee");
+      } else if (normalizedRole.includes("manager")) {
+        router.push("/dashboard/manager");
+      } else if (normalizedRole.includes("admin")) {
+        router.push("/dashboard/admin");
       } else {
-        alert('Unknown role: ' + data.user.role);
+        alert("Unknown role: " + data.user.role);
       }
-
     } catch (err: any) {
       alert(err.message);
     } finally {
@@ -70,136 +68,169 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4 selection:bg-blue-500/30">
-      <div className="max-w-md w-full bg-[#0b1120]/80 backdrop-blur-xl border border-white/10 p-8 md:p-10 rounded-3xl shadow-2xl relative overflow-hidden">
+    <main className="min-h-screen bg-background text-foreground">
+      <div className="grid min-h-screen grid-cols-1 lg:grid-cols-2">
+        <section className="hidden bg-slate-950 text-white lg:flex lg:flex-col lg:justify-between p-10">
+          <div>
+            <div className="flex items-center gap-3">
+              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-600 font-bold">
+                AQ
+              </div>
+              <div>
+                <h1 className="text-lg font-bold">AtomQuest</h1>
+                <p className="text-sm text-slate-400">Performance Portal</p>
+              </div>
+            </div>
 
-        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500"></div>
+            <div className="mt-24 max-w-xl">
+              <p className="mb-4 text-sm font-semibold uppercase tracking-[0.25em] text-blue-300">
+                Goal governance platform
+              </p>
 
-        <div className="absolute -top-24 -right-24 w-48 h-48 bg-blue-500/20 rounded-full blur-3xl"></div>
+              <h2 className="text-5xl font-semibold tracking-tight leading-tight">
+                Align teams, track outcomes, and close review cycles.
+              </h2>
 
-        <h1 className="text-4xl font-bold text-white mb-2 tracking-tight">
-          AtomQuest
-        </h1>
+              <p className="mt-6 text-base leading-7 text-slate-300">
+                A role-based platform for employees, managers, and HR teams to manage goals,
+                quarterly check-ins, reviews, approvals, and governance insights.
+              </p>
+            </div>
+          </div>
 
-        <p className="text-slate-400 mb-8 text-sm">
-          Enterprise Goal-Setting & Tracking Portal
-        </p>
+          <div className="grid grid-cols-3 gap-4 text-sm">
+            <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+              <p className="text-2xl font-bold">3</p>
+              <p className="text-slate-400">User roles</p>
+            </div>
 
-        <form onSubmit={handleAuth} className="space-y-4 relative z-10">
+            <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+              <p className="text-2xl font-bold">4</p>
+              <p className="text-slate-400">Quarter cycles</p>
+            </div>
 
-          {!isLogin && (
-            <>
-              <div className="space-y-1">
-                <label className="text-xs text-slate-400 uppercase tracking-wider font-semibold">
-                  Full Name
-                </label>
+            <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+              <p className="text-2xl font-bold">100%</p>
+              <p className="text-slate-400">Weight validation</p>
+            </div>
+          </div>
+        </section>
 
-                <div className="relative">
-                  <User
-                    size={18}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"
-                  />
-
-                  <input
-                    type="text"
-                    value={name}
-                    onChange={e => setName(e.target.value)}
-                    required
-                    className="w-full bg-black/20 border border-slate-700/50 rounded-xl py-3 pl-10 pr-4 text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all font-medium"
-                  />
+        <section className="flex items-center justify-center px-5 py-10">
+          <div className="w-full max-w-md">
+            <div className="mb-8 lg:hidden">
+              <div className="flex items-center gap-3">
+                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary text-primary-foreground font-bold">
+                  AQ
+                </div>
+                <div>
+                  <h1 className="text-lg font-bold">AtomQuest</h1>
+                  <p className="text-sm text-muted-foreground">Performance Portal</p>
                 </div>
               </div>
+            </div>
 
-              <div className="space-y-1">
-                <label className="text-xs text-slate-400 uppercase tracking-wider font-semibold">
-                  Persona Role
-                </label>
+            <div className="rounded-3xl border border-border bg-card p-8 shadow-sm">
+              <div className="mb-8">
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                  <ShieldCheck size={24} />
+                </div>
 
-                <select
-                  value={role}
-                  onChange={e => setRole(e.target.value)}
-                  className="w-full bg-black/20 border border-slate-700/50 rounded-xl py-3 px-4 text-white outline-none focus:ring-2 focus:ring-blue-500/50"
-                >
-                  <option value="Employee">Employee</option>
-                  <option value="Manager">Manager</option>
-                  <option value="Admin">Admin</option>
-                </select>
+                <h2 className="text-2xl font-bold tracking-tight">
+                  {isLogin ? "Sign in to your workspace" : "Create your account"}
+                </h2>
+
+                <p className="mt-2 text-sm text-muted-foreground">
+                  {isLogin
+                    ? "Use your assigned employee, manager, or admin credentials."
+                    : "Register with your role to access the portal."}
+                </p>
               </div>
-            </>
-          )}
 
-          <div className="space-y-1">
-            <label className="text-xs text-slate-400 uppercase tracking-wider font-semibold">
-              Email Address
-            </label>
+              <form onSubmit={handleAuth} className="space-y-4">
+                {!isLogin && (
+                  <>
+                    <div className="space-y-2">
+                      <label className="aq-label">Full name</label>
+                      <div className="relative">
+                        <User size={17} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                        <input
+                          type="text"
+                          value={name}
+                          onChange={(e) => setName(e.target.value)}
+                          required
+                          placeholder="Enter your full name"
+                          className="aq-input pl-10"
+                        />
+                      </div>
+                    </div>
 
-            <div className="relative">
-              <User
-                size={18}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"
-              />
+                    <div className="space-y-2">
+                      <label className="aq-label">Role</label>
+                      <select
+                        value={role}
+                        onChange={(e) => setRole(e.target.value)}
+                        className="aq-input"
+                      >
+                        <option value="Employee">Employee</option>
+                        <option value="Manager">Manager</option>
+                        <option value="Admin">Admin</option>
+                      </select>
+                    </div>
+                  </>
+                )}
 
-              <input
-                type="email"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                required
-                placeholder="enterprise@atomberg.com"
-                className="w-full bg-black/20 border border-slate-700/50 rounded-xl py-3 pl-10 pr-4 text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all font-medium"
-              />
+                <div className="space-y-2">
+                  <label className="aq-label">Email address</label>
+                  <div className="relative">
+                    <Mail size={17} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                      placeholder="name@company.com"
+                      className="aq-input pl-10"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="aq-label">Password</label>
+                  <div className="relative">
+                    <Lock size={17} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                    <input
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      placeholder="Enter password"
+                      className="aq-input pl-10"
+                    />
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground transition hover:opacity-90 disabled:opacity-60"
+                >
+                  {loading ? "Please wait..." : isLogin ? "Sign in" : "Create account"}
+                  <ArrowRight size={17} />
+                </button>
+              </form>
+
+              <button
+                type="button"
+                onClick={() => setIsLogin(!isLogin)}
+                className="mt-6 w-full text-center text-sm font-medium text-muted-foreground hover:text-foreground"
+              >
+                {isLogin ? "Need an account? Create one" : "Already registered? Sign in"}
+              </button>
             </div>
           </div>
-
-          <div className="space-y-1 mb-8">
-            <label className="text-xs text-slate-400 uppercase tracking-wider font-semibold">
-              Security Credential
-            </label>
-
-            <div className="relative">
-              <Lock
-                size={18}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"
-              />
-
-              <input
-                type="password"
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                required
-                placeholder="••••••••"
-                className="w-full bg-black/20 border border-slate-700/50 rounded-xl py-3 pl-10 pr-4 text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all font-medium"
-              />
-            </div>
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full mt-2 py-3.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-semibold shadow-xl shadow-blue-600/30 transition-all flex justify-center items-center gap-2 group disabled:opacity-50"
-          >
-            {loading
-              ? 'Processing...'
-              : (isLogin ? 'Secure Access' : 'Register Account')}
-
-            <Shield
-              size={18}
-              className="group-hover:scale-110 transition-transform"
-            />
-          </button>
-        </form>
-
-        <div className="mt-6 text-center relative z-10">
-          <button
-            onClick={() => setIsLogin(!isLogin)}
-            type="button"
-            className="text-slate-400 hover:text-white text-sm font-medium transition-colors"
-          >
-            {isLogin
-              ? 'Need an account? Sign up'
-              : 'Already have an account? Login'}
-          </button>
-        </div>
+        </section>
       </div>
-    </div>
+    </main>
   );
 }

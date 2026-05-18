@@ -31,69 +31,195 @@
   --radius-sm: calc(var(--radius) - 4px);
 }
 
-@layer base {
-  :root {
-    --background: #ffffff;
-    --foreground: #020817;
+:root {
+  --background: #f8fafc;
+  --foreground: #0f172a;
 
-    --card: #ffffff;
-    --card-foreground: #020817;
+  --card: rgba(255, 255, 255, 0.82);
+  --card-foreground: #020617;
 
-    --primary: #3b82f6; /* Blue 500 */
-    --primary-foreground: #f8fafc;
+  --primary: #2563eb;
+  --primary-foreground: #ffffff;
 
-    --secondary: #f1f5f9;
-    --secondary-foreground: #0f172a;
+  --secondary: #e2e8f0;
+  --secondary-foreground: #0f172a;
 
-    --muted: #f1f5f9;
-    --muted-foreground: #64748b;
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
 
-    --accent: #f1f5f9;
-    --accent-foreground: #0f172a;
+  --accent: #eef2ff;
+  --accent-foreground: #1e293b;
 
-    --destructive: #ef4444;
-    --destructive-foreground: #f8fafc;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
 
-    --border: #e2e8f0;
-    --input: #e2e8f0;
-    --ring: #3b82f6;
+  --border: rgba(148, 163, 184, 0.25);
+  --input: rgba(255, 255, 255, 0.75);
+  --ring: #3b82f6;
 
-    --radius: 0.5rem;
-  }
+  --radius: 1rem;
+}
 
-  /* Force Dark Mode natively for AtomQuest presentation */
-  .dark, body {
-    --background: #020617; /* Slate 950 */
-    --foreground: #f8fafc;
+.dark {
+  --background: #020617;
+  --foreground: #f8fafc;
 
-    --card: #0b1120;
-    --card-foreground: #f8fafc;
+  --card: rgba(15, 23, 42, 0.72);
+  --card-foreground: #f8fafc;
 
-    --primary: #3b82f6;
-    --primary-foreground: #f8fafc;
+  --primary: #3b82f6;
+  --primary-foreground: #ffffff;
 
-    --secondary: #1e293b;
-    --secondary-foreground: #f8fafc;
+  --secondary: #1e293b;
+  --secondary-foreground: #f8fafc;
 
-    --muted: #1e293b;
-    --muted-foreground: #94a3b8;
+  --muted: #0f172a;
+  --muted-foreground: #94a3b8;
 
-    --accent: #1e293b;
-    --accent-foreground: #f8fafc;
+  --accent: #172033;
+  --accent-foreground: #f8fafc;
 
-    --destructive: #ef4444; /* Red 500 */
-    --destructive-foreground: #f8fafc;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
 
-    --border: #1e293b;
-    --input: #1e293b;
-    --ring: #3b82f6;
-  }
+  --border: rgba(255, 255, 255, 0.08);
+  --input: rgba(15, 23, 42, 0.85);
+  --ring: #60a5fa;
 }
 
 @layer base {
-  body {
-    background-color: var(--background);
-    color: var(--foreground);
-    @apply antialiased min-h-screen selection:bg-primary/30;
+  * {
+    border-color: var(--border);
   }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background:
+      radial-gradient(circle at top left, rgba(37, 99, 235, 0.08), transparent 30%),
+      radial-gradient(circle at bottom right, rgba(16, 185, 129, 0.08), transparent 25%),
+      var(--background);
+    color: var(--foreground);
+    @apply antialiased min-h-screen;
+  }
+
+  button {
+    @apply transition-all duration-200;
+  }
+
+  input,
+  textarea,
+  select {
+    @apply outline-none;
+  }
+}
+
+.aq-input {
+  @apply h-12 w-full rounded-2xl border px-4 text-sm transition-all duration-200;
+  border-color: var(--border);
+  background: var(--input);
+  color: var(--foreground);
+  backdrop-filter: blur(10px);
+}
+
+.aq-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12);
+}
+
+.aq-input::placeholder {
+  color: #94a3b8;
+}
+
+.aq-label {
+  @apply text-sm font-medium text-muted-foreground;
+}
+
+.aq-card {
+  background: var(--card);
+  color: var(--card-foreground);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(16px);
+  @apply rounded-3xl shadow-sm;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(100, 116, 139, 0.4);
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 116, 139, 0.6);
+}
+
+::selection {
+  background: rgba(59, 130, 246, 0.25);
+}
+
+.aq-glass {
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.aq-button-primary {
+  @apply h-12 rounded-2xl px-5 font-medium transition-all duration-200;
+  background: var(--primary);
+  color: white;
+}
+
+.aq-button-primary:hover {
+  transform: translateY(-1px);
+  opacity: 0.92;
+}
+
+.aq-button-secondary {
+  @apply h-12 rounded-2xl px-5 font-medium transition-all duration-200 border;
+  background: var(--card);
+  border-color: var(--border);
+}
+
+.aq-button-secondary:hover {
+  background: var(--accent);
+}
+
+.aq-hover-lift {
+  @apply transition-all duration-300;
+}
+
+.aq-hover-lift:hover {
+  transform: translateY(-4px);
+}
+
+.aq-section {
+  @apply space-y-6;
+}
+
+.aq-title {
+  @apply text-4xl font-bold tracking-tight;
+}
+
+.aq-subtitle {
+  @apply text-muted-foreground text-base;
+}
+
+/* Prevent Chrome autofill from making fields look pre-filled/demo-like */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+select:-webkit-autofill {
+  -webkit-text-fill-color: var(--foreground);
+  -webkit-box-shadow: 0 0 0px 1000px var(--background) inset;
+  transition: background-color 9999s ease-in-out 0s;
 }
