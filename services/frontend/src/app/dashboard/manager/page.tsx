@@ -2,20 +2,32 @@
 
 import { useEffect, useState } from "react";
 import {
-  CheckCircle2,
-  MessageSquare,
-  Edit3,
   AlertCircle,
+  BarChart3,
+  Bell,
+  CheckCircle2,
+  Clock3,
+  Edit3,
+  MessageSquare,
   RefreshCw,
-  XCircle,
   Save,
+  Settings,
+  Target,
+  TrendingUp,
+  Users,
+  XCircle,
 } from "lucide-react";
+
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/components/ui/toast";
 
 type Quarter = "q1" | "q2" | "q3" | "q4";
+
+const API_URL =
+  process.env.NEXT_PUBLIC_API_URL ||
+  "https://atomquest-backend-7u7u.onrender.com";
 
 export default function ManagerDashboard() {
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -40,7 +52,7 @@ export default function ManagerDashboard() {
     try {
       const token = getToken();
 
-      const res = await fetch("https://atomquest-backend-7u7u.onrender.com/api/goals/manager/team", {
+      const res = await fetch(`${API_URL}/api/goals/manager/team`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -91,7 +103,6 @@ export default function ManagerDashboard() {
 
   useEffect(() => {
     fetchTeamData();
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -107,6 +118,18 @@ export default function ManagerDashboard() {
 
   const getPendingCount = () => {
     return teamData.filter((td) => td.sheet?.status === "Submitted").length;
+  };
+
+  const getApprovedCount = () => {
+    return teamData.filter((td) => td.sheet?.status === "Approved").length;
+  };
+
+  const getRejectedCount = () => {
+    return teamData.filter((td) => td.sheet?.status === "Rejected").length;
+  };
+
+  const getTotalGoalsCount = () => {
+    return teamData.reduce((sum, td) => sum + Number(td.goals?.length || 0), 0);
   };
 
   const getExpandedData = () => {
@@ -148,17 +171,14 @@ export default function ManagerDashboard() {
         isShared: Boolean(draft.isShared),
       };
 
-      const res = await fetch(
-        `https://atomquest-backend-7u7u.onrender.com/api/goals/${goalId}/manager-edit`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(payload),
-        }
-      );
+      const res = await fetch(`${API_URL}/api/goals/${goalId}/manager-edit`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      });
 
       const data = await res.json();
 
@@ -185,7 +205,7 @@ export default function ManagerDashboard() {
       setActionLoading(true);
       const token = getToken();
 
-      const res = await fetch(`https://atomquest-backend-7u7u.onrender.com/api/goals/${sheetId}/approve`, {
+      const res = await fetch(`${API_URL}/api/goals/${sheetId}/approve`, {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -219,7 +239,7 @@ export default function ManagerDashboard() {
       setActionLoading(true);
       const token = getToken();
 
-      const res = await fetch(`https://atomquest-backend-7u7u.onrender.com/api/goals/${sheetId}/reject`, {
+      const res = await fetch(`${API_URL}/api/goals/${sheetId}/reject`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -257,19 +277,16 @@ export default function ManagerDashboard() {
       setActionLoading(true);
       const token = getToken();
 
-      const res = await fetch(
-        `https://atomquest-backend-7u7u.onrender.com/api/goals/${goalId}/review/${selectedQuarter}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            checkInComment: comment,
-          }),
-        }
-      );
+      const res = await fetch(`${API_URL}/api/goals/${goalId}/review/${selectedQuarter}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          checkInComment: comment,
+        }),
+      });
 
       const data = await res.json();
 
@@ -306,48 +323,122 @@ export default function ManagerDashboard() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-6 mb-16">
-        <header className="mb-8 border-b pb-6 flex flex-col sm:flex-row justify-between sm:items-end gap-4">
+      <div className="space-y-8 mb-16">
+        <header className="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
           <div>
-            <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-500 mb-2 tracking-tight">
-              Manager Approval Center
+            <p className="text-sm font-semibold uppercase tracking-[0.22em] text-muted-foreground">
+              Manager Workspace
+            </p>
+
+            <h1 className="mt-3 text-4xl font-bold tracking-tight sm:text-5xl">
+              Approval Center
             </h1>
-            <p className="text-muted-foreground text-sm">
-              Review, Edit, Approve, and Request Rework for Team Goals
+
+            <p className="mt-3 max-w-3xl text-base leading-7 text-muted-foreground">
+              Review team goals, request rework, approve goal sheets, and add quarterly manager feedback.
             </p>
           </div>
 
-          <div className="bg-emerald-500/10 text-emerald-500 px-4 py-2 rounded-lg border border-emerald-500/20 text-sm font-medium shadow-[0_0_15px_rgba(16,185,129,0.15)] flex items-center justify-center">
-            {getPendingCount()} Pending Approvals
-          </div>
+          <button
+            onClick={fetchTeamData}
+            disabled={loading}
+            className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl border border-border bg-card px-5 text-sm font-semibold shadow-sm hover:bg-accent disabled:opacity-60 sm:w-fit"
+          >
+            <RefreshCw size={18} className={loading ? "animate-spin" : ""} />
+            Refresh Team Data
+          </button>
         </header>
 
-        {loading ? (
-          <div className="flex animate-pulse justify-center py-10 opacity-50">
-            <RefreshCw size={24} className="animate-spin text-primary" />
-            <span className="ml-3 text-sm text-foreground my-auto">
-              Loading team data...
-            </span>
-          </div>
-        ) : error ? (
-          <div className="bg-red-500/10 border border-red-500/20 p-6 rounded-xl flex items-start gap-4">
-            <AlertCircle className="text-red-500 shrink-0 mt-0.5" />
-            <div>
-              <h3 className="font-semibold text-red-500 mb-1">
-                Error Loading Data
-              </h3>
-              <p className="text-sm text-red-400/80">{error}</p>
+        <section className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
+          <Card className="p-6">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="text-sm text-muted-foreground">Team Members</p>
+                <h2 className="mt-3 text-4xl font-bold">{teamData.length}</h2>
+                <p className="mt-2 text-xs text-muted-foreground">Assigned employees</p>
+              </div>
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-500/10 text-blue-500">
+                <Users size={26} />
+              </div>
             </div>
-            <Button
-              variant="outline"
-              className="ml-auto bg-transparent border-red-500/20 text-red-500 hover:bg-red-500/10"
-              onClick={fetchTeamData}
-            >
-              Retry
-            </Button>
-          </div>
+          </Card>
+
+          <Card className="p-6">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="text-sm text-muted-foreground">Pending Reviews</p>
+                <h2 className="mt-3 text-4xl font-bold text-amber-500">
+                  {getPendingCount()}
+                </h2>
+                <p className="mt-2 text-xs text-muted-foreground">Awaiting manager action</p>
+              </div>
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-500/10 text-amber-500">
+                <Clock3 size={26} />
+              </div>
+            </div>
+          </Card>
+
+          <Card className="p-6">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="text-sm text-muted-foreground">Approved Sheets</p>
+                <h2 className="mt-3 text-4xl font-bold text-emerald-500">
+                  {getApprovedCount()}
+                </h2>
+                <p className="mt-2 text-xs text-muted-foreground">Completed approvals</p>
+              </div>
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-500">
+                <CheckCircle2 size={26} />
+              </div>
+            </div>
+          </Card>
+
+          <Card className="p-6">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="text-sm text-muted-foreground">Team Goals</p>
+                <h2 className="mt-3 text-4xl font-bold text-primary">
+                  {getTotalGoalsCount()}
+                </h2>
+                <p className="mt-2 text-xs text-muted-foreground">Goals under review</p>
+              </div>
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                <Target size={26} />
+              </div>
+            </div>
+          </Card>
+        </section>
+
+        {loading ? (
+          <Card className="p-10">
+            <div className="flex animate-pulse justify-center py-10 opacity-70">
+              <RefreshCw size={24} className="animate-spin text-primary" />
+              <span className="ml-3 text-sm text-foreground my-auto">
+                Loading team data...
+              </span>
+            </div>
+          </Card>
+        ) : error ? (
+          <Card className="border-red-500/20 bg-red-500/10 p-6">
+            <div className="flex items-start gap-4">
+              <AlertCircle className="text-red-500 shrink-0 mt-0.5" />
+              <div>
+                <h3 className="font-semibold text-red-500 mb-1">
+                  Error Loading Data
+                </h3>
+                <p className="text-sm text-red-400/80">{error}</p>
+              </div>
+              <Button
+                variant="outline"
+                className="ml-auto bg-transparent border-red-500/20 text-red-500 hover:bg-red-500/10"
+                onClick={fetchTeamData}
+              >
+                Retry
+              </Button>
+            </div>
+          </Card>
         ) : teamData.length === 0 ? (
-          <div className="bg-card border border-border p-12 rounded-xl text-center flex flex-col items-center">
+          <Card className="p-12 text-center flex flex-col items-center">
             <div className="w-16 h-16 rounded-full bg-accent flex items-center justify-center mb-4">
               <CheckCircle2 size={32} className="text-muted-foreground" />
             </div>
@@ -357,28 +448,25 @@ export default function ManagerDashboard() {
             <p className="text-sm text-muted-foreground max-w-sm">
               You currently do not have any employees assigned to you for performance review.
             </p>
-          </div>
+          </Card>
         ) : (
-          <Card className="rounded-xl overflow-hidden shadow-xl bg-card border-border">
+          <Card className="overflow-hidden">
+            <div className="border-b border-border px-6 py-5">
+              <h2 className="text-xl font-bold tracking-tight">Review Queue</h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Expand employees to review submitted goals, edit details, approve, or request rework.
+              </p>
+            </div>
+
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm text-muted-foreground">
                 <thead className="bg-muted/50 text-foreground uppercase text-xs border-b border-border">
                   <tr>
-                    <th className="px-6 py-5 font-semibold tracking-wider">
-                      Employee
-                    </th>
-                    <th className="px-6 py-5 font-semibold tracking-wider">
-                      Department
-                    </th>
-                    <th className="px-6 py-5 font-semibold tracking-wider">
-                      Goals Total Wt %
-                    </th>
-                    <th className="px-6 py-5 font-semibold tracking-wider">
-                      Sheet Status
-                    </th>
-                    <th className="px-6 py-5 font-semibold tracking-wider">
-                      Actions
-                    </th>
+                    <th className="px-6 py-5 font-semibold tracking-wider">Employee</th>
+                    <th className="px-6 py-5 font-semibold tracking-wider">Department</th>
+                    <th className="px-6 py-5 font-semibold tracking-wider">Goals Total Wt %</th>
+                    <th className="px-6 py-5 font-semibold tracking-wider">Sheet Status</th>
+                    <th className="px-6 py-5 font-semibold tracking-wider">Actions</th>
                   </tr>
                 </thead>
 
@@ -390,10 +478,7 @@ export default function ManagerDashboard() {
                     const statusBadgeClass = getStatusBadgeClass(status);
 
                     return (
-                      <tr
-                        key={emp._id}
-                        className="hover:bg-accent/40 transition-colors"
-                      >
+                      <tr key={emp._id} className="hover:bg-accent/40 transition-colors">
                         <td className="px-6 py-5 font-medium text-foreground">
                           {emp.name}
                           <div className="text-xs text-muted-foreground mt-1">
@@ -516,9 +601,9 @@ export default function ManagerDashboard() {
                           rows={2}
                           className="w-full bg-accent/30 border border-input rounded-xl px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition-all resize-y"
                           placeholder="Provide feedback on why the goal sheet needs rework..."
-                        ></textarea>
+                        />
 
-                        <div className="mt-4 flex justify-end gap-3">
+                        <div className="mt-4 flex flex-wrap justify-end gap-3">
                           <Button
                             variant="outline"
                             className="border-red-500/20 text-red-500 hover:bg-red-500/10"
@@ -542,7 +627,7 @@ export default function ManagerDashboard() {
                     )}
 
                     <div>
-                      <div className="flex border-b border-border mb-6">
+                      <div className="flex border-b border-border mb-6 overflow-x-auto">
                         {(["q1", "q2", "q3", "q4"] as Quarter[]).map((q) => (
                           <button
                             key={q}
@@ -558,7 +643,7 @@ export default function ManagerDashboard() {
                         ))}
                       </div>
 
-                      <div className="flex items-center justify-between mb-4">
+                      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-4">
                         <h3 className="text-foreground font-semibold text-base tracking-tight">
                           {selectedQuarter.toUpperCase()} Goal Reviews & Manager Edits
                         </h3>
@@ -600,11 +685,7 @@ export default function ManagerDashboard() {
                                     <input
                                       value={draft.thrustArea}
                                       onChange={(e) =>
-                                        updateEditableGoal(
-                                          goal._id,
-                                          "thrustArea",
-                                          e.target.value
-                                        )
+                                        updateEditableGoal(goal._id, "thrustArea", e.target.value)
                                       }
                                       className="w-full bg-accent/30 border border-border rounded-lg px-3 py-2 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary"
                                     />
@@ -630,11 +711,7 @@ export default function ManagerDashboard() {
                                     <textarea
                                       value={draft.description}
                                       onChange={(e) =>
-                                        updateEditableGoal(
-                                          goal._id,
-                                          "description",
-                                          e.target.value
-                                        )
+                                        updateEditableGoal(goal._id, "description", e.target.value)
                                       }
                                       rows={2}
                                       className="w-full bg-accent/30 border border-border rounded-lg px-3 py-2 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary resize-y"
@@ -642,7 +719,7 @@ export default function ManagerDashboard() {
                                   </div>
                                 </div>
 
-                                <div className="grid grid-cols-2 sm:grid-cols-5 gap-4 mb-6">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4 mb-6">
                                   <div className="bg-accent/30 p-3 rounded-lg border border-border">
                                     <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">
                                       UoM
@@ -669,11 +746,7 @@ export default function ManagerDashboard() {
                                       type="number"
                                       value={draft.target}
                                       onChange={(e) =>
-                                        updateEditableGoal(
-                                          goal._id,
-                                          "target",
-                                          Number(e.target.value)
-                                        )
+                                        updateEditableGoal(goal._id, "target", Number(e.target.value))
                                       }
                                       className="w-full bg-background border border-border rounded-md px-2 py-1 text-sm text-foreground"
                                     />
@@ -687,11 +760,7 @@ export default function ManagerDashboard() {
                                       type="number"
                                       value={draft.weightage}
                                       onChange={(e) =>
-                                        updateEditableGoal(
-                                          goal._id,
-                                          "weightage",
-                                          Number(e.target.value)
-                                        )
+                                        updateEditableGoal(goal._id, "weightage", Number(e.target.value))
                                       }
                                       className="w-full bg-background border border-border rounded-md px-2 py-1 text-sm text-foreground"
                                     />
@@ -730,9 +799,7 @@ export default function ManagerDashboard() {
                                   </label>
 
                                   <textarea
-                                    value={
-                                      checkInComments[`${goal._id}-${selectedQuarter}`] ?? ""
-                                    }
+                                    value={checkInComments[`${goal._id}-${selectedQuarter}`] ?? ""}
                                     onChange={(e) =>
                                       setCheckInComments((prev) => ({
                                         ...prev,
@@ -748,9 +815,8 @@ export default function ManagerDashboard() {
                                     <Button
                                       onClick={() => handleSubmitReview(goal._id)}
                                       disabled={
-                                        !checkInComments[
-                                          `${goal._id}-${selectedQuarter}`
-                                        ]?.trim() || actionLoading
+                                        !checkInComments[`${goal._id}-${selectedQuarter}`]?.trim() ||
+                                        actionLoading
                                       }
                                     >
                                       <MessageSquare size={16} className="mr-2" />
@@ -779,6 +845,199 @@ export default function ManagerDashboard() {
             )}
           </Card>
         )}
+
+        <section id="dashboard-insights" className="space-y-6 scroll-mt-8">
+          <div className="flex items-center gap-3">
+            <BarChart3 className="text-primary" size={22} />
+            <div>
+              <h2 className="text-2xl font-bold tracking-tight">Manager Insights</h2>
+              <p className="text-sm text-muted-foreground">
+                Approval performance, review progress, and team workflow health.
+              </p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
+            <Card className="p-6">
+              <p className="text-sm text-muted-foreground">Pending Reviews</p>
+              <h3 className="mt-2 text-4xl font-bold text-amber-500">
+                {getPendingCount()}
+              </h3>
+            </Card>
+
+            <Card className="p-6">
+              <p className="text-sm text-muted-foreground">Approved Sheets</p>
+              <h3 className="mt-2 text-4xl font-bold text-emerald-500">
+                {getApprovedCount()}
+              </h3>
+            </Card>
+
+            <Card className="p-6">
+              <p className="text-sm text-muted-foreground">Team Goals</p>
+              <h3 className="mt-2 text-4xl font-bold text-primary">
+                {getTotalGoalsCount()}
+              </h3>
+            </Card>
+
+            <Card className="p-6">
+              <p className="text-sm text-muted-foreground">Rejected Reviews</p>
+              <h3 className="mt-2 text-4xl font-bold text-red-500">
+                {getRejectedCount()}
+              </h3>
+            </Card>
+          </div>
+
+          <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
+            <Card className="p-6 xl:col-span-2">
+              <div className="mb-8 flex items-center justify-between">
+                <div>
+                  <h3 className="text-xl font-bold">Review Performance</h3>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Team approval workflow insights
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2 text-primary">
+                  <TrendingUp size={18} />
+                  <span className="text-sm font-semibold">+18%</span>
+                </div>
+              </div>
+
+              <div className="space-y-6">
+                <div>
+                  <div className="mb-2 flex items-center justify-between">
+                    <span className="text-sm font-medium">Approval Rate</span>
+                    <span className="text-sm font-bold">92%</span>
+                  </div>
+                  <div className="h-3 overflow-hidden rounded-full bg-muted">
+                    <div className="h-full w-[92%] rounded-full bg-emerald-500" />
+                  </div>
+                </div>
+
+                <div>
+                  <div className="mb-2 flex items-center justify-between">
+                    <span className="text-sm font-medium">Quarterly Completion</span>
+                    <span className="text-sm font-bold">68%</span>
+                  </div>
+                  <div className="h-3 overflow-hidden rounded-full bg-muted">
+                    <div className="h-full w-[68%] rounded-full bg-primary" />
+                  </div>
+                </div>
+
+                <div>
+                  <div className="mb-2 flex items-center justify-between">
+                    <span className="text-sm font-medium">Review Coverage</span>
+                    <span className="text-sm font-bold">84%</span>
+                  </div>
+                  <div className="h-3 overflow-hidden rounded-full bg-muted">
+                    <div className="h-full w-[84%] rounded-full bg-purple-500" />
+                  </div>
+                </div>
+              </div>
+            </Card>
+
+            <Card className="p-6">
+              <h3 className="text-xl font-bold">Recent Activity</h3>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Latest review events
+              </p>
+
+              <div className="mt-6 space-y-4">
+                {[
+                  "Goal sheet approved",
+                  "Rework requested",
+                  "Q1 review updated",
+                  "Shared KPI updated",
+                ].map((item, index) => (
+                  <div key={item} className="flex gap-3">
+                    <div
+                      className={`mt-2 h-3 w-3 rounded-full ${
+                        index === 0
+                          ? "bg-emerald-500"
+                          : index === 1
+                          ? "bg-amber-500"
+                          : index === 2
+                          ? "bg-primary"
+                          : "bg-purple-500"
+                      }`}
+                    />
+
+                    <div>
+                      <p className="text-sm font-semibold">{item}</p>
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        Manager workflow updated successfully.
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          </div>
+        </section>
+
+        <section id="dashboard-notifications" className="space-y-5 scroll-mt-8">
+          <div className="flex items-center gap-3">
+            <Bell className="text-primary" size={22} />
+            <div>
+              <h2 className="text-2xl font-bold tracking-tight">Notifications</h2>
+              <p className="text-sm text-muted-foreground">
+                Review alerts and pending workflow reminders.
+              </p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+            <Card className="p-5">
+              <p className="font-semibold">Pending approval queue</p>
+              <p className="mt-2 text-sm text-muted-foreground">
+                {getPendingCount()} employee goal sheet(s) need approval.
+              </p>
+            </Card>
+
+            <Card className="p-5">
+              <p className="font-semibold">Quarter check-in reminder</p>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Q1 review window is active for manager feedback.
+              </p>
+            </Card>
+
+            <Card className="p-5">
+              <p className="font-semibold">Rework monitoring</p>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Track rejected sheets and employee resubmissions.
+              </p>
+            </Card>
+          </div>
+        </section>
+
+        <section id="dashboard-settings" className="space-y-5 scroll-mt-8">
+          <div className="flex items-center gap-3">
+            <Settings className="text-primary" size={22} />
+            <div>
+              <h2 className="text-2xl font-bold tracking-tight">Manager Settings</h2>
+              <p className="text-sm text-muted-foreground">
+                Workflow preferences and review cycle information.
+              </p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+            <Card className="p-5">
+              <p className="text-sm text-muted-foreground">Review Cycle</p>
+              <p className="mt-2 text-lg font-bold">FY 2026–2027 • Q1</p>
+            </Card>
+
+            <Card className="p-5">
+              <p className="text-sm text-muted-foreground">Approval Mode</p>
+              <p className="mt-2 text-lg font-bold">Manager Review Enabled</p>
+            </Card>
+
+            <Card className="p-5">
+              <p className="text-sm text-muted-foreground">Access Level</p>
+              <p className="mt-2 text-lg font-bold">Manager Workspace</p>
+            </Card>
+          </div>
+        </section>
       </div>
     </DashboardLayout>
   );
