@@ -47,18 +47,25 @@ export default function Home() {
         throw new Error(data.message || "Authentication failed");
       }
 
-      setAuth(data.token, data.user);
+      if (isLogin) {
+        setAuth(data.token, data.user);
 
-      const normalizedRole = data.user.role?.toLowerCase();
+        const normalizedRole = data.user.role?.toLowerCase();
 
-      if (normalizedRole.includes("employee")) {
-        router.push("/dashboard/employee");
-      } else if (normalizedRole.includes("manager")) {
-        router.push("/dashboard/manager");
-      } else if (normalizedRole.includes("admin")) {
-        router.push("/dashboard/admin");
+        if (normalizedRole.includes("employee")) {
+          router.push("/dashboard/employee");
+        } else if (normalizedRole.includes("manager")) {
+          router.push("/dashboard/manager");
+        } else if (normalizedRole.includes("admin")) {
+          router.push("/dashboard/admin");
+        } else {
+          alert("Unknown role: " + data.user.role);
+        }
       } else {
-        alert("Unknown role: " + data.user.role);
+        alert("Account created successfully. Please sign in.");
+
+        setIsLogin(true);
+        setPassword("");
       }
     } catch (err: any) {
       alert(err.message);
@@ -153,7 +160,10 @@ export default function Home() {
                     <div className="space-y-2">
                       <label className="aq-label">Full name</label>
                       <div className="relative">
-                        <User size={17} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                        <User
+                          size={17}
+                          className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+                        />
                         <input
                           type="text"
                           value={name}
@@ -183,7 +193,10 @@ export default function Home() {
                 <div className="space-y-2">
                   <label className="aq-label">Email address</label>
                   <div className="relative">
-                    <Mail size={17} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                    <Mail
+                      size={17}
+                      className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+                    />
                     <input
                       type="email"
                       value={email}
@@ -198,7 +211,10 @@ export default function Home() {
                 <div className="space-y-2">
                   <label className="aq-label">Password</label>
                   <div className="relative">
-                    <Lock size={17} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                    <Lock
+                      size={17}
+                      className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+                    />
                     <input
                       type="password"
                       value={password}
