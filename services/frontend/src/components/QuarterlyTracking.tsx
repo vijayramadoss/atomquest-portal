@@ -1,7 +1,15 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { CheckCircle2, AlertCircle, Save } from "lucide-react";
+import {
+  AlertCircle,
+  CheckCircle2,
+  Clock3,
+  Loader2,
+  Save,
+  TrendingUp,
+} from "lucide-react";
+
 import { useGoalStore } from "@/store/useGoalStore";
 
 type Quarter = "Q1" | "Q2" | "Q3" | "Q4";
@@ -185,27 +193,35 @@ export default function QuarterlyTracking() {
   };
 
   return (
-    <div className="bg-white/5 border border-white/10 rounded-xl p-6 mt-8">
-      <div className="flex justify-between items-center mb-6">
+    <section className="rounded-3xl border border-border bg-card/80 p-6 shadow-sm">
+      <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <h2 className="text-xl font-bold text-white mb-1">
-            Quarterly Achievement Tracking
+          <div className="flex items-center gap-2 text-primary">
+            <TrendingUp size={18} />
+            <span className="text-sm font-semibold uppercase tracking-[0.18em]">
+              Quarterly Insights
+            </span>
+          </div>
+
+          <h2 className="mt-3 text-2xl font-bold tracking-tight">
+            Achievement Tracking
           </h2>
 
-          <p className="text-sm text-slate-400">
-            Update actuals against your planned values
+          <p className="mt-2 text-sm text-muted-foreground">
+            Update actual achievements against your planned goals and track
+            quarter-wise performance progression.
           </p>
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           {(["Q1", "Q2", "Q3", "Q4"] as Quarter[]).map((q) => (
             <button
               key={q}
               onClick={() => setActiveQuarter(q)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              className={`rounded-2xl px-5 py-2.5 text-sm font-semibold transition-all ${
                 activeQuarter === q
-                  ? "bg-blue-600 text-white"
-                  : "bg-slate-800 text-slate-400 hover:bg-slate-700"
+                  ? "bg-primary text-primary-foreground shadow-lg"
+                  : "border border-border bg-background hover:bg-accent"
               }`}
             >
               {q}
@@ -215,108 +231,157 @@ export default function QuarterlyTracking() {
       </div>
 
       {message && (
-        <div className="mb-4 rounded-lg border border-blue-500/30 bg-blue-500/10 px-4 py-3 text-sm text-blue-200">
+        <div className="mt-6 rounded-2xl border border-primary/20 bg-primary/10 px-4 py-3 text-sm font-medium text-primary">
           {message}
         </div>
       )}
 
-      <div className="space-y-4">
+      <div className="mt-8 space-y-5">
         {localGoals.length === 0 ? (
-          <div className="text-sm text-slate-400 bg-[#0b1120] border border-slate-800 rounded-lg p-4">
-            No goals found yet. Create and submit goals first.
+          <div className="rounded-2xl border border-border bg-background/60 p-8 text-center">
+            <Clock3 size={32} className="mx-auto text-muted-foreground" />
+
+            <h3 className="mt-4 text-lg font-semibold">
+              No goals available yet
+            </h3>
+
+            <p className="mt-2 text-sm text-muted-foreground">
+              Create and submit goals before starting quarterly tracking.
+            </p>
           </div>
         ) : (
           localGoals.map((g) => (
             <div
               key={g._id}
-              className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center bg-[#0b1120] border border-slate-800 rounded-lg p-4"
+              className="rounded-3xl border border-border bg-background/60 p-5 transition hover:border-primary/30 hover:shadow-md"
             >
-              <div className="md:col-span-4">
-                <h4 className="text-sm font-semibold text-slate-200">
-                  {g.title}
-                </h4>
+              <div className="flex flex-col gap-6 xl:flex-row xl:items-center xl:justify-between">
+                <div className="xl:max-w-[28%]">
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-lg font-semibold tracking-tight">
+                      {g.title}
+                    </h3>
 
-                <p className="text-xs text-slate-500 mt-1">
-                  Target:{" "}
-                  {g.uom === "Timeline"
-                    ? g.targetDate || g.target
-                    : g.target}{" "}
-                  ({g.uom})
-                </p>
-              </div>
+                    <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
+                      {g.uom}
+                    </span>
+                  </div>
 
-              <div className="md:col-span-3">
-                <label className="text-xs text-slate-500 mb-1 block">
-                  Actual Achievement
-                </label>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    {g.description}
+                  </p>
 
-                <input
-                  type="text"
-                  value={g.achievement}
-                  onChange={(e) =>
-                    updateAchievement(g._id, e.target.value)
-                  }
-                  className="w-full bg-slate-900 border border-slate-700 rounded-md px-3 py-1.5 text-sm text-white focus:ring-1 focus:ring-blue-500 outline-none"
-                  placeholder={
-                    g.uom === "Timeline"
-                      ? "Not applicable"
-                      : "Enter value"
-                  }
-                  disabled={g.uom === "Timeline"}
-                />
-              </div>
+                  <div className="mt-4 flex flex-wrap gap-3">
+                    <div className="rounded-xl border border-border bg-card px-3 py-2 text-xs">
+                      <span className="text-muted-foreground">Target:</span>{" "}
+                      <span className="font-semibold">
+                        {g.uom === "Timeline"
+                          ? g.targetDate || g.target
+                          : g.target}
+                      </span>
+                    </div>
 
-              <div className="md:col-span-3">
-                <label className="text-xs text-slate-500 mb-1 block">
-                  Status
-                </label>
+                    <div className="rounded-xl border border-border bg-card px-3 py-2 text-xs">
+                      <span className="text-muted-foreground">
+                        Weightage:
+                      </span>{" "}
+                      <span className="font-semibold">
+                        {g.weightage}%
+                      </span>
+                    </div>
+                  </div>
+                </div>
 
-                <select
-                  value={g.status}
-                  onChange={(e) =>
-                    updateStatus(
-                      g._id,
-                      e.target.value as
-                        | "Not Started"
-                        | "On Track"
-                        | "Completed"
-                    )
-                  }
-                  className="w-full bg-slate-900 border border-slate-700 rounded-md px-3 py-1.5 text-sm text-white focus:ring-1 focus:ring-blue-500 outline-none"
-                >
-                  <option value="Not Started">Not Started</option>
-                  <option value="On Track">On Track</option>
-                  <option value="Completed">Completed</option>
-                </select>
-              </div>
+                <div className="grid flex-1 grid-cols-1 gap-4 md:grid-cols-3">
+                  <div>
+                    <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                      Actual Achievement
+                    </label>
 
-              <div className="md:col-span-2 text-right">
-                <label className="text-xs text-slate-500 mb-1 block">
-                  Progress
-                </label>
-
-                <div className="flex items-center justify-end gap-2">
-                  <span
-                    className={`text-lg font-bold ${
-                      g.progressScore >= 100
-                        ? "text-emerald-400"
-                        : "text-blue-400"
-                    }`}
-                  >
-                    {g.progressScore}%
-                  </span>
-
-                  {g.progressScore >= 100 ? (
-                    <CheckCircle2
-                      size={16}
-                      className="text-emerald-400"
+                    <input
+                      type="text"
+                      value={g.achievement}
+                      onChange={(e) =>
+                        updateAchievement(g._id, e.target.value)
+                      }
+                      className="aq-input"
+                      placeholder={
+                        g.uom === "Timeline"
+                          ? "Not required"
+                          : "Enter actual value"
+                      }
+                      disabled={g.uom === "Timeline"}
                     />
-                  ) : (
-                    <AlertCircle
-                      size={16}
-                      className="text-blue-400"
-                    />
-                  )}
+                  </div>
+
+                  <div>
+                    <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                      Status
+                    </label>
+
+                    <select
+                      value={g.status}
+                      onChange={(e) =>
+                        updateStatus(
+                          g._id,
+                          e.target.value as
+                            | "Not Started"
+                            | "On Track"
+                            | "Completed"
+                        )
+                      }
+                      className="aq-input"
+                    >
+                      <option value="Not Started">Not Started</option>
+                      <option value="On Track">On Track</option>
+                      <option value="Completed">Completed</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                      Progress
+                    </label>
+
+                    <div className="rounded-2xl border border-border bg-card p-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-3xl font-bold tracking-tight">
+                            {g.progressScore}%
+                          </p>
+
+                          <p className="mt-1 text-xs text-muted-foreground">
+                            Completion score
+                          </p>
+                        </div>
+
+                        {g.progressScore >= 100 ? (
+                          <CheckCircle2
+                            size={26}
+                            className="text-emerald-500"
+                          />
+                        ) : (
+                          <AlertCircle
+                            size={26}
+                            className="text-blue-500"
+                          />
+                        )}
+                      </div>
+
+                      <div className="mt-4 h-2 rounded-full bg-muted">
+                        <div
+                          className={`h-2 rounded-full ${
+                            g.progressScore >= 100
+                              ? "bg-emerald-500"
+                              : "bg-primary"
+                          }`}
+                          style={{
+                            width: `${Math.min(g.progressScore, 100)}%`,
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -324,19 +389,23 @@ export default function QuarterlyTracking() {
         )}
       </div>
 
-      <div className="mt-6 flex justify-end">
+      <div className="mt-8 flex justify-end">
         <button
           onClick={saveQuarterCheckIn}
           disabled={saving || localGoals.length === 0}
-          className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg text-sm font-medium shadow-lg shadow-blue-500/20 transition-colors"
+          className="flex h-12 items-center gap-2 rounded-2xl bg-primary px-6 text-sm font-semibold text-primary-foreground shadow-lg transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
         >
-          <Save size={16} />
+          {saving ? (
+            <Loader2 size={18} className="animate-spin" />
+          ) : (
+            <Save size={18} />
+          )}
 
           {saving
             ? "Saving..."
             : `Save ${activeQuarter} Check-in`}
         </button>
       </div>
-    </div>
+    </section>
   );
 }
