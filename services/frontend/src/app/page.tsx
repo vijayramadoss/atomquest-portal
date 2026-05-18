@@ -22,6 +22,27 @@ export default function Home() {
 
   const [loading, setLoading] = useState(false);
 
+  const redirectByRole = (userRole: string) => {
+    const normalizedRole = userRole?.trim().toLowerCase();
+
+    if (normalizedRole === "employee") {
+      router.push("/dashboard/employee");
+      return;
+    }
+
+    if (normalizedRole === "manager") {
+      router.push("/dashboard/manager");
+      return;
+    }
+
+    if (normalizedRole === "admin") {
+      router.push("/dashboard/admin");
+      return;
+    }
+
+    alert("Unknown role: " + userRole);
+  };
+
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -30,8 +51,16 @@ export default function Home() {
       const endpoint = isLogin ? "/api/auth/login" : "/api/auth/register";
 
       const bodyPayload = isLogin
-        ? { email, password }
-        : { name, email, password, role };
+        ? {
+            email: email.trim(),
+            password,
+          }
+        : {
+            name: name.trim(),
+            email: email.trim(),
+            password,
+            role,
+          };
 
       const res = await fetch(`${API_URL}${endpoint}`, {
         method: "POST",
@@ -47,28 +76,26 @@ export default function Home() {
         throw new Error(data.message || "Authentication failed");
       }
 
-      if (isLogin) {
-        setAuth(data.token, data.user);
-
-        const normalizedRole = data.user.role?.toLowerCase();
-
-        if (normalizedRole.includes("employee")) {
-          router.push("/dashboard/employee");
-        } else if (normalizedRole.includes("manager")) {
-          router.push("/dashboard/manager");
-        } else if (normalizedRole.includes("admin")) {
-          router.push("/dashboard/admin");
-        } else {
-          alert("Unknown role: " + data.user.role);
-        }
-      } else {
-        alert("Account created successfully. Please sign in.");
+      if (!isLogin) {
+        alert(`${role} account created successfully. Please sign in.`);
 
         setIsLogin(true);
+        setName("");
+        setEmail("");
         setPassword("");
+        setRole("Employee");
+
+        return;
       }
+
+      if (!data.token || !data.user) {
+        throw new Error("Login failed. Token or user data missing.");
+      }
+
+      setAuth(data.token, data.user);
+      redirectByRole(data.user.role);
     } catch (err: any) {
-      alert(err.message);
+      alert(err.message || "Something went wrong");
     } finally {
       setLoading(false);
     }
@@ -149,8 +176,8 @@ export default function Home() {
 
                 <p className="mt-2 text-sm text-muted-foreground">
                   {isLogin
-                    ? "Use your assigned employee, manager, or admin credentials."
-                    : "Register with your role to access the portal."}
+                    ? "Use your employee, manager, or admin credentials."
+                    : "Register with your role to access the correct dashboard."}
                 </p>
               </div>
 
@@ -181,6 +208,7 @@ export default function Home() {
                         value={role}
                         onChange={(e) => setRole(e.target.value)}
                         className="aq-input"
+                        required
                       >
                         <option value="Employee">Employee</option>
                         <option value="Manager">Manager</option>
@@ -238,7 +266,10 @@ export default function Home() {
 
               <button
                 type="button"
-                onClick={() => setIsLogin(!isLogin)}
+                onClick={() => {
+                  setIsLogin(!isLogin);
+                  setPassword("");
+                }}
                 className="mt-6 w-full text-center text-sm font-medium text-muted-foreground hover:text-foreground"
               >
                 {isLogin ? "Need an account? Create one" : "Already registered? Sign in"}
