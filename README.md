@@ -1,17 +1,29 @@
 # 🚀 AtomQuest — Enterprise KPI & Goal Governance Portal
 
-## 🏆 AtomQuest Hackathon 1.0 Submission
+<div align="center">
+
+![Next.js](https://img.shields.io/badge/Next.js-15-black?style=for-the-badge&logo=next.js)
+![React](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript)
+![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-47A248?style=for-the-badge&logo=mongodb)
+![TailwindCSS](https://img.shields.io/badge/TailwindCSS-38B2AC?style=for-the-badge&logo=tailwind-css)
+![Express](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express)
+![JWT](https://img.shields.io/badge/Auth-JWT-blue?style=for-the-badge)
+
+### 🏆 AtomQuest Hackathon 1.0 Submission
 
 A modern enterprise-grade KPI governance and employee performance tracking platform designed to streamline organizational goal setting, approvals, quarterly reviews, and analytics.
+
+</div>
 
 ---
 
 # 🌐 Live Demo
 
-Frontend URL:  
+🔗 **Frontend URL:**  
 https://atomquest-portal-zeta-liard.vercel.app
 
-GitHub Repository:  
+🔗 **GitHub Repository:**  
 https://github.com/vijayramadoss/atomquest-portal
 
 ---
@@ -20,7 +32,7 @@ https://github.com/vijayramadoss/atomquest-portal
 
 Organizations often struggle with fragmented goal management systems involving spreadsheets, emails, and disconnected review cycles.
 
-AtomQuest solves this by providing a centralized web-based portal for:
+**AtomQuest** solves this by providing a centralized web-based portal for:
 
 - Goal creation & tracking
 - Role-based workflows
@@ -31,9 +43,9 @@ AtomQuest solves this by providing a centralized web-based portal for:
 
 The platform supports complete workflows for:
 
-- Employee
-- Manager
-- Admin / HR Teams
+- 👨‍💼 Employees
+- 🧑‍💼 Managers
+- 🛡️ Admin / HR Teams
 
 ---
 
@@ -71,9 +83,9 @@ Employees can:
 
 ### Validation Rules Implemented
 
-- Total goal weightage must equal 100%
-- Minimum goal weightage: 10%
-- Maximum goals allowed: 8
+✅ Total goal weightage must equal **100%**  
+✅ Minimum goal weightage: **10%**  
+✅ Maximum goals allowed: **8**
 
 ---
 
@@ -158,23 +170,85 @@ MongoDB Atlas Database
 
 ---
 
+# 📸 Application Screenshots
+
+## 🔑 Authentication Portal
+
+Modern role-based authentication interface.
+
+![Login](./screenshots/login.png)
+
+---
+
+## 👨‍💼 Employee Dashboard
+
+Goal creation, KPI management, and quarterly tracking.
+
+![Employee Dashboard](./screenshots/employee-dashboard.png)
+
+---
+
+## 📈 Quarterly Achievement Tracking
+
+Track planned vs actual achievements with progress analytics.
+
+![Quarterly Tracking](./screenshots/quarterly-tracking.png)
+
+---
+
+## 🧑‍💼 Manager Approval Workspace
+
+Manager review queues, approvals, and employee governance.
+
+![Manager Dashboard](./screenshots/manager-dashboard.png)
+
+---
+
+## 📊 Manager Insights & Analytics
+
+Approval metrics and governance performance dashboards.
+
+![Manager Analytics](./screenshots/manager-analytics.png)
+
+---
+
+## 🛡️ Admin Governance Dashboard
+
+Enterprise KPI governance and organization-wide analytics.
+
+![Admin Dashboard](./screenshots/admin-dashboard.png)
+
+---
+
+## 🚨 Shared Goals & Governance Tools
+
+Shared KPI distribution and escalation workflows.
+
+![Admin Governance](./screenshots/admin-governance.png)
+
+---
+
 # 👥 Demo Credentials
 
-## Employee
+## 👨‍💼 Employee
 
 ```text
 Email: realemployee@test.com
 Password: employee123
 ```
 
-## Manager
+---
+
+## 🧑‍💼 Manager
 
 ```text
 Email: manager@test.com
 Password: manager123
 ```
 
-## Admin
+---
+
+## 🛡️ Admin
 
 ```text
 Email: admin@test.com
@@ -185,7 +259,7 @@ Password: admin123
 
 # ⚙️ Local Setup Instructions
 
-## 1. Clone Repository
+## 1️⃣ Clone Repository
 
 ```bash
 git clone https://github.com/vijayramadoss/atomquest-portal.git
@@ -193,7 +267,7 @@ git clone https://github.com/vijayramadoss/atomquest-portal.git
 
 ---
 
-## 2. Install Dependencies
+## 2️⃣ Install Dependencies
 
 ### Frontend
 
@@ -211,7 +285,7 @@ npm install
 
 ---
 
-## 3. Configure Environment Variables
+## 3️⃣ Configure Environment Variables
 
 ### Frontend `.env.local`
 
@@ -229,7 +303,7 @@ PORT=5000
 
 ---
 
-## 4. Run Development Servers
+## 4️⃣ Run Development Servers
 
 ### Frontend
 
@@ -254,6 +328,8 @@ atomquest-portal/
 │   ├── frontend/
 │   └── backend/
 │
+├── screenshots/
+│
 └── README.md
 ```
 
@@ -261,17 +337,17 @@ atomquest-portal/
 
 # 🎯 Hackathon Requirements Covered
 
-- Goal Creation & Submission
-- Goal Validation Rules
-- Quarterly Achievement Tracking
-- Role-Based Dashboards
-- Manager Approval Workflow
-- Admin Governance Console
-- Analytics Dashboard
-- KPI Tracking
-- Shared Goal Governance
-- Responsive UI
-- Live Deployment
+✅ Goal Creation & Submission  
+✅ Goal Validation Rules  
+✅ Quarterly Achievement Tracking  
+✅ Role-Based Dashboards  
+✅ Manager Approval Workflow  
+✅ Admin Governance Console  
+✅ Analytics Dashboard  
+✅ KPI Tracking  
+✅ Shared Goal Governance  
+✅ Responsive UI  
+✅ Live Deployment  
 
 ---
 
@@ -301,3 +377,11 @@ Solo Hackathon Project Submission for:
 # 📄 License
 
 This project is developed for educational and hackathon purposes.
+
+---
+
+<div align="center">
+
+### ⭐ If you like this project, consider giving it a star on GitHub ⭐
+
+</div>
