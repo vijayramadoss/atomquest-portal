@@ -17,6 +17,7 @@ import {
   TrendingUp,
   Unplug,
   Users,
+  UserCheck,
 } from "lucide-react";
 import {
   Area,
@@ -36,7 +37,12 @@ const API_URL =
   process.env.NEXT_PUBLIC_API_URL ||
   "https://atomquest-backend-7u7u.onrender.com";
 
-type AdminTab = "shared" | "reports" | "unlock" | "escalations";
+type AdminTab =
+  | "shared"
+  | "reports"
+  | "unlock"
+  | "escalations"
+  | "assignments";
 
 const trendData = [
   { quarter: "Q1", completion: 64, target: 78 },
@@ -46,44 +52,16 @@ const trendData = [
 ];
 
 const activityFeed = [
-  {
-    title: "Shared KPI pushed to Sales team",
-    time: "12 min ago",
-    type: "KPI",
-  },
-  {
-    title: "Manager approved Q1 goal sheet",
-    time: "38 min ago",
-    type: "Approval",
-  },
-  {
-    title: "Escalation reminder generated",
-    time: "1 hr ago",
-    type: "Escalation",
-  },
-  {
-    title: "CSV report exported by Admin",
-    time: "Today",
-    type: "Report",
-  },
+  { title: "Shared KPI pushed to Sales team", time: "12 min ago", type: "KPI" },
+  { title: "Manager approved Q1 goal sheet", time: "38 min ago", type: "Approval" },
+  { title: "Escalation reminder generated", time: "1 hr ago", type: "Escalation" },
+  { title: "CSV report exported by Admin", time: "Today", type: "Report" },
 ];
 
 const upcomingDeadlines = [
-  {
-    title: "Q1 Check-in Review",
-    date: "Jul 10",
-    status: "Upcoming",
-  },
-  {
-    title: "Manager Approval Window",
-    date: "Jul 15",
-    status: "Pending",
-  },
-  {
-    title: "Escalation Review",
-    date: "Jul 20",
-    status: "Scheduled",
-  },
+  { title: "Q1 Check-in Review", date: "Jul 10", status: "Upcoming" },
+  { title: "Manager Approval Window", date: "Jul 15", status: "Pending" },
+  { title: "Escalation Review", date: "Jul 20", status: "Scheduled" },
 ];
 
 export default function AdminDashboard() {
@@ -92,6 +70,8 @@ export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState<AdminTab>("shared");
   const [analytics, setAnalytics] = useState<any>(null);
   const [sheets, setSheets] = useState<any[]>([]);
+  const [employees, setEmployees] = useState<any[]>([]);
+  const [managers, setManagers] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
   const [sharedGoal, setSharedGoal] = useState({
@@ -125,11 +105,14 @@ export default function AdminDashboard() {
     try {
       setLoading(true);
 
-      const [analyticsRes, sheetsRes, escRes] = await Promise.all([
-        fetch(`${API_URL}/api/admin/analytics`, { headers: authHeaders }),
-        fetch(`${API_URL}/api/admin/goalsheets`, { headers: authHeaders }),
-        fetch(`${API_URL}/api/admin/escalations`, { headers: authHeaders }),
-      ]);
+      const [analyticsRes, sheetsRes, escRes, managersRes, employeesRes] =
+        await Promise.all([
+          fetch(`${API_URL}/api/admin/analytics`, { headers: authHeaders }),
+          fetch(`${API_URL}/api/admin/goalsheets`, { headers: authHeaders }),
+          fetch(`${API_URL}/api/admin/escalations`, { headers: authHeaders }),
+          fetch(`${API_URL}/api/admin/managers`, { headers: authHeaders }),
+          fetch(`${API_URL}/api/admin/employees`, { headers: authHeaders }),
+        ]);
 
       if (!analyticsRes.ok) throw new Error("Failed to fetch analytics");
       if (!sheetsRes.ok) throw new Error("Failed to fetch goal sheets");
@@ -139,6 +122,16 @@ export default function AdminDashboard() {
 
       setAnalytics(analyticsData);
       setSheets(sheetsData.sheets || []);
+
+      if (managersRes.ok) {
+        const managersData = await managersRes.json();
+        setManagers(managersData.managers || []);
+      }
+
+      if (employeesRes.ok) {
+        const employeesData = await employeesRes.json();
+        setEmployees(employeesData.employees || []);
+      }
 
       if (escRes.ok) {
         const escData = await escRes.json();
@@ -231,6 +224,42 @@ export default function AdminDashboard() {
       await fetchAdminData();
     } catch (error: any) {
       addToast(error.message, "error");
+    }
+  };
+
+  const assignEmployeeToManager = async (
+    employeeId: string,
+    managerId: string
+  ) => {
+    try {
+      const res = await fetch(
+        `${API_URL}/api/admin/employees/${employeeId}/assign-manager`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            ...authHeaders,
+          },
+          body: JSON.stringify({ managerId }),
+        }
+      );
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message || "Failed to assign employee");
+      }
+
+      addToast(
+        managerId
+          ? "Employee assigned to manager successfully"
+          : "Manager assignment removed successfully",
+        "success"
+      );
+
+      await fetchAdminData();
+    } catch (error: any) {
+      addToast(error.message || "Assignment failed", "error");
     }
   };
 
@@ -340,6 +369,12 @@ export default function AdminDashboard() {
       desc: "Configure reminders and delayed review actions.",
       icon: Unplug,
     },
+    {
+      id: "assignments" as AdminTab,
+      title: "Assignments",
+      desc: "Assign employees to managers.",
+      icon: UserCheck,
+    },
   ];
 
   return (
@@ -356,7 +391,8 @@ export default function AdminDashboard() {
             </h1>
 
             <p className="mt-3 max-w-3xl text-base leading-7 text-muted-foreground">
-              Manage organization-wide KPIs, approvals, analytics, reporting, and review governance.
+              Manage organization-wide KPIs, approvals, analytics, reporting,
+              role assignments, and review governance.
             </p>
           </div>
 
@@ -381,7 +417,9 @@ export default function AdminDashboard() {
               >
                 <div className="flex items-start justify-between gap-4">
                   <div>
-                    <p className="text-sm text-muted-foreground">{item.title}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {item.title}
+                    </p>
                     <h2 className="mt-3 text-4xl font-bold tracking-tight">
                       {item.value}
                     </h2>
@@ -489,7 +527,7 @@ export default function AdminDashboard() {
           </Card>
         </div>
 
-        <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-5">
           {cards.map((item) => {
             const Icon = item.icon;
             const active = activeTab === item.id;
@@ -506,9 +544,7 @@ export default function AdminDashboard() {
               >
                 <div
                   className={`mb-6 flex h-14 w-14 items-center justify-center rounded-2xl ${
-                    active
-                      ? "bg-white/15 text-white"
-                      : "bg-primary/10 text-primary"
+                    active ? "bg-white/15 text-white" : "bg-primary/10 text-primary"
                   }`}
                 >
                   <Icon size={26} />
@@ -750,6 +786,62 @@ export default function AdminDashboard() {
                 </button>
               </div>
             )}
+
+            {activeTab === "assignments" && (
+              <div>
+                <h2 className="text-2xl font-bold tracking-tight">
+                  Employee Assignments
+                </h2>
+
+                <p className="mt-2 text-sm text-muted-foreground">
+                  Assign employees to their respective reporting managers.
+                </p>
+
+                <div className="mt-6 space-y-4">
+                  {employees.length === 0 ? (
+                    <p className="text-sm text-muted-foreground">
+                      No employees found.
+                    </p>
+                  ) : (
+                    employees.map((employee) => (
+                      <div
+                        key={employee._id}
+                        className="flex flex-col gap-4 rounded-2xl border border-border bg-background/60 p-4 lg:flex-row lg:items-center lg:justify-between"
+                      >
+                        <div>
+                          <p className="font-semibold">{employee.name}</p>
+
+                          <p className="text-sm text-muted-foreground">
+                            {employee.email}
+                          </p>
+
+                          <p className="mt-1 text-xs text-primary">
+                            Current Manager:{" "}
+                            {employee.managerId?.name || "Not Assigned"}
+                          </p>
+                        </div>
+
+                        <select
+                          className="aq-input min-w-[240px]"
+                          value={employee.managerId?._id || ""}
+                          onChange={(e) =>
+                            assignEmployeeToManager(employee._id, e.target.value)
+                          }
+                        >
+                          <option value="">No Manager</option>
+
+                          {managers.map((manager) => (
+                            <option key={manager._id} value={manager._id}>
+                              {manager.name} — {manager.email}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            )}
           </Card>
 
           <div className="space-y-6">
@@ -769,7 +861,9 @@ export default function AdminDashboard() {
                   >
                     <div>
                       <p className="text-sm font-semibold">{item.title}</p>
-                      <p className="text-xs text-muted-foreground">{item.date}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {item.date}
+                      </p>
                     </div>
 
                     <span className="rounded-full bg-blue-500/10 px-3 py-1 text-xs font-semibold text-blue-600 dark:text-blue-400">

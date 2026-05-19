@@ -10,6 +10,9 @@ import {
   exportGoalsReport,
   getEscalationSettings,
   updateEscalationSettings,
+  getManagers,
+  getEmployees,
+  assignEmployeeToManager,
 } from "../controllers/admin.controller";
 
 const router = Router();
@@ -51,6 +54,27 @@ router.put(
   authenticate,
   authorize([Role.ADMIN]),
   updateEscalationSettings
+);
+
+router.get(
+  "/managers",
+  authenticate,
+  authorize([Role.ADMIN]),
+  getManagers
+);
+
+router.get(
+  "/employees",
+  authenticate,
+  authorize([Role.ADMIN]),
+  getEmployees
+);
+
+router.put(
+  "/employees/:employeeId/assign-manager",
+  authenticate,
+  authorize([Role.ADMIN]),
+  assignEmployeeToManager
 );
 
 export default router;

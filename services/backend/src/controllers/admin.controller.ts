@@ -31,17 +31,18 @@ export const getAdminAnalytics = async (req: AuthRequest, res: Response) => {
     ]);
 
     const allGoals = await Goal.find();
-
     const quarters = ["q1", "q2", "q3", "q4"];
 
     const qOqData = quarters.map((q) => {
-      const totalTarget = allGoals.reduce((sum, g: any) => {
-        return sum + Number(g.target || 0);
-      }, 0);
+      const totalTarget = allGoals.reduce(
+        (sum, g: any) => sum + Number(g.target || 0),
+        0
+      );
 
-      const totalAchieved = allGoals.reduce((sum, g: any) => {
-        return sum + Number(g[q]?.achievement || 0);
-      }, 0);
+      const totalAchieved = allGoals.reduce(
+        (sum, g: any) => sum + Number(g[q]?.achievement || 0),
+        0
+      );
 
       return {
         quarter: q.toUpperCase(),
@@ -71,7 +72,7 @@ export const getAdminAnalytics = async (req: AuthRequest, res: Response) => {
 export const getAllGoalSheets = async (req: AuthRequest, res: Response) => {
   try {
     const sheets = await GoalSheet.find()
-      .populate("employeeId", "name email department role")
+      .populate("employeeId", "name email department role managerId")
       .sort({ updatedAt: -1 });
 
     res.json({ sheets });
@@ -116,7 +117,14 @@ export const createSharedGoal = async (req: AuthRequest, res: Response) => {
   } = req.body;
 
   try {
-    if (!thrustArea || !title || !description || !uom || target === undefined || !weightage) {
+    if (
+      !thrustArea ||
+      !title ||
+      !description ||
+      !uom ||
+      target === undefined ||
+      !weightage
+    ) {
       res.status(400).json({ message: "All shared goal fields are required" });
       return;
     }
@@ -253,15 +261,97 @@ export const exportGoalsReport = async (req: AuthRequest, res: Response) => {
 
     const csv = rows
       .map((row) =>
-        row
-          .map((value) => `"${String(value).replace(/"/g, '""')}"`)
-          .join(",")
+        row.map((value) => `"${String(value).replace(/"/g, '""')}"`).join(",")
       )
       .join("\n");
 
     res.setHeader("Content-Type", "text/csv");
     res.setHeader("Content-Disposition", "attachment; filename=goals-report.csv");
     res.send(csv);
+  } catch (error) {
+    res.status(500).json({ message: (error as Error).message });
+  }
+};
+
+export const getManagers = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const managers = await User.find({ role: Role.MANAGER })
+      .select("-passwordHash")
+      .sort({ name: 1 });
+
+    res.json({ managers });
+  } catch (error) {
+    res.status(500).json({ message: (error as Error).message });
+  }
+};
+
+export const getEmployees = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const employees = await User.find({ role: Role.EMPLOYEE })
+      .populate("managerId", "name email department role")
+      .select("-passwordHash")
+      .sort({ name: 1 });
+
+    res.json({ employees });
+  } catch (error) {
+    res.status(500).json({ message: (error as Error).message });
+  }
+};
+
+export const assignEmployeeToManager = async (
+  req: AuthRequest,
+  res: Response
+): Promise<void> => {
+  const { employeeId } = req.params;
+  const { managerId } = req.body;
+
+  try {
+    const employee = await User.findById(employeeId);
+
+    if (!employee) {
+      res.status(404).json({ message: "Employee not found" });
+      return;
+    }
+
+    if (employee.role !== Role.EMPLOYEE) {
+      res.status(400).json({ message: "Selected user is not an employee" });
+      return;
+    }
+
+    if (!managerId) {
+      employee.managerId = undefined;
+      await employee.save();
+
+      res.json({
+        message: "Manager assignment removed successfully",
+        employee,
+      });
+      return;
+    }
+
+    const manager = await User.findById(managerId);
+
+    if (!manager) {
+      res.status(404).json({ message: "Manager not found" });
+      return;
+    }
+
+    if (manager.role !== Role.MANAGER) {
+      res.status(400).json({ message: "Selected user is not a manager" });
+      return;
+    }
+
+    employee.managerId = manager._id as any;
+    await employee.save();
+
+    const updatedEmployee = await User.findById(employee._id)
+      .populate("managerId", "name email department role")
+      .select("-passwordHash");
+
+    res.json({
+      message: "Employee assigned to manager successfully",
+      employee: updatedEmployee,
+    });
   } catch (error) {
     res.status(500).json({ message: (error as Error).message });
   }
