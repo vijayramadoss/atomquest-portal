@@ -20,6 +20,8 @@ import {
 } from "lucide-react";
 
 import { useGoalStore } from "@/store/useGoalStore";
+import InsightsPanel from "@/components/InsightsPanel";
+import SettingsPanel from "@/components/SettingsPanel";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -35,6 +37,8 @@ export default function DashboardLayout({
 
   const [mounted, setMounted] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [insightsOpen, setInsightsOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   const [theme, setTheme] = useState<"light" | "dark">("dark");
 
@@ -103,20 +107,30 @@ export default function DashboardLayout({
   const quickMenu = [
     {
       label: "Insights",
-      href: "#dashboard-insights",
       icon: BarChart3,
+      onClick: () => {
+        setInsightsOpen(true);
+        setSidebarOpen(false);
+      },
     },
 
     {
       label: "Notifications",
-      href: "#dashboard-notifications",
       icon: Bell,
+      onClick: () => {
+        const target = document.querySelector("#dashboard-notifications");
+        if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+        setSidebarOpen(false);
+      },
     },
 
     {
       label: "Settings",
-      href: "#dashboard-settings",
       icon: Settings,
+      onClick: () => {
+        setSettingsOpen(true);
+        setSidebarOpen(false);
+      },
     },
   ];
 
@@ -220,31 +234,16 @@ export default function DashboardLayout({
               const Icon = item.icon;
 
               return (
-                <a
+                <button
                   key={item.label}
-                  href={item.href}
-                  onClick={(e) => {
-                    if (item.href.startsWith("#")) {
-                      e.preventDefault();
-
-                      const target = document.querySelector(item.href);
-
-                      if (target) {
-                        target.scrollIntoView({
-                          behavior: "smooth",
-                          block: "start",
-                        });
-                      }
-
-                      setSidebarOpen(false);
-                    }
-                  }}
-                  className="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium text-muted-foreground transition hover:bg-accent hover:text-foreground"
+                  type="button"
+                  onClick={item.onClick}
+                  className="flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium text-muted-foreground transition hover:bg-accent hover:text-foreground"
                 >
                   <Icon size={17} />
 
                   {item.label}
-                </a>
+                </button>
               );
             })}
           </div>
@@ -322,6 +321,18 @@ export default function DashboardLayout({
           {children}
         </div>
       </main>
+
+      <InsightsPanel
+        open={insightsOpen}
+        onClose={() => setInsightsOpen(false)}
+      />
+
+      <SettingsPanel
+        open={settingsOpen}
+        onClose={() => setSettingsOpen(false)}
+        theme={theme}
+        onToggleTheme={toggleTheme}
+      />
     </div>
   );
 }
