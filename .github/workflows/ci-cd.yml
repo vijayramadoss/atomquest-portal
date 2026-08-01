@@ -47,7 +47,7 @@ jobs:
           NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
 
       - name: Dockerize Architecture (Dry-Run)
-        run: docker-compose build
+        run: docker compose build
 
   deploy-vercel:
     name: Deploy Next.js to Vercel (Production)
