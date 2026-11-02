@@ -1,6 +1,13 @@
 import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
+import bcrypt from "bcryptjs";
 import User, { Role } from "../models/User";
+
+const SALT_ROUNDS = 10;
+
+// Accounts created before hashing was added still hold plain-text passwords.
+// bcrypt hashes always start with "$2", so anything else is a legacy password.
+const isBcryptHash = (value: string) => /^\$2[aby]\$\d{2}\$/.test(value);
 
 // -------------------------
 // REGISTER CONTROLLER
@@ -30,10 +37,12 @@ export const register = async (req: Request, res: Response): Promise<void> => {
       }
     }
 
+    const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
+
     const newUser = await User.create({
       name,
       email,
-      passwordHash: password,
+      passwordHash,
       role,
       managerId: finalManagerId,
       department,
@@ -65,7 +74,25 @@ export const login = async (req: Request, res: Response): Promise<void> => {
   try {
     const user = await User.findOne({ email });
 
-    if (!user || user.passwordHash !== password) {
+    if (!user || !password) {
+      res.status(401).json({ message: "Invalid credentials" });
+      return;
+    }
+
+    let isMatch: boolean;
+
+    if (isBcryptHash(user.passwordHash)) {
+      isMatch = await bcrypt.compare(password, user.passwordHash);
+    } else {
+      // Legacy plain-text account: check it once, then upgrade it to a hash
+      isMatch = user.passwordHash === password;
+      if (isMatch) {
+        user.passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
+        await user.save();
+      }
+    }
+
+    if (!isMatch) {
       res.status(401).json({ message: "Invalid credentials" });
       return;
     }
